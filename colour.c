@@ -1,24 +1,3 @@
-#include <Arduino.h>
-#include <Wire.h>
-#include <SoftwareSerial.h>
-#include <MeMCore.h>
-
-#define RGBWait 150 //in milliseconds 
-#define LDRWait 10 //in milliseconds
-int colourArray[] = {0,0,0};
-int blackArray[] = {392,306,330};
-MeRGBLed rgbled_7(7, 7==7?2:4);
-MeLightSensor lightsensor_6(6);
-int colours[3][3] = {
-  {255,0,0},
-  {0,255,0},
-  {0,0,255}
-};
-
-void setup(){
-  Serial.begin(9600);
-}
-
 void colour(){
   int total = 0;
   for(int i = 0; i < 3; i++){
@@ -64,8 +43,4 @@ int getAvgReading(int times){
      delay(LDRWait);
   }
   return total/times;
-}
-
-void loop(){
-  colour();
 }
