@@ -24,7 +24,7 @@ void detect_line() {
     motor_left.run(0);
     motor_right.run(0);
     delay(300);
-    turn(LEFTLEFT);
+    colour();
   }
   //check_challenge();
 }

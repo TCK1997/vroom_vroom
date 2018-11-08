@@ -8,28 +8,36 @@ void colour(){
     colourArray[i] = colourArray[i] - blackArray[i];
     total += colourArray[i];
   }
+  /*
   Serial.print("Red: ");
   Serial.print(colourArray[0]);
   Serial.print("Green: ");
   Serial.print(colourArray[1]);
   Serial.print("Blue: ");
   Serial.println(colourArray[2]);
+  */
   if(total > 1500){
-    Serial.println("WHITE");
+    //Serial.println("WHITE");
+    turn(U_TURN);
   } else if (total < 100){
-    Serial.println("BLACK");
+    //Serial.println("BLACK");
+    //end();
   } else if (colourArray[2] > colourArray[0] && colourArray[2] > colourArray[1]){
-    Serial.println("BLUE");
+    //Serial.println("BLUE");
+    turn(RIGHTRIGHT);
   } else if (colourArray[1] > colourArray[0] && colourArray[1] > colourArray[2]){
-    Serial.println("GREEN");
+    //Serial.println("GREEN");
+    turn(RIGHT);
   } else if (colourArray[0] > colourArray[1] && colourArray[0] > colourArray[2]){
     total = colourArray[1] + colourArray[2];
-    Serial.print("TOTAL :");
-    Serial.print(total);
+    //Serial.print("TOTAL :");
+    //Serial.print(total);
     if(total < 280){
-      Serial.println("RED");
+      //Serial.println("RED");
+      turn(LEFT);
     } else if (total >= 280){
-      Serial.println("ORANGE");
+      //Serial.println("ORANGE");
+      turn(LEFTLEFT);
     }
   }
 }
