@@ -164,7 +164,7 @@ void sound() {
       turn(U_TURN);
     } else if (sound_300 - sound_3000 > diff && sound_300 > 300){
       turn(LEFT);
-    } else if (sound_3000 - sound_300 > diff && sound _3000 > 200){
+    } else if (sound_3000 - sound_300 > diff && sound_3000 > 200){
       turn(RIGHT);
     }
 }
@@ -193,7 +193,7 @@ void colour(){
     turn(U_TURN);
   } else if (total < 100){
     Serial.println("BLACK");
-    //end();
+    end();
   } else if (colourArray[2] > colourArray[0] && colourArray[2] > colourArray[1]){
     Serial.println("BLUE");
     turn(RIGHTRIGHT);
@@ -278,4 +278,8 @@ void move_straight() {
 
 void loop() {
   move_straight();
+}
+
+void end(){
+  while(1);
 }
