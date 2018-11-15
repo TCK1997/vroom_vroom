@@ -8,7 +8,8 @@
 #define LDR_WAIT
 #define RGBWait 150 //in milliseconds 
 #define LDRWait 10 //in milliseconds
-#define ORANGE_RED 230 //was 658
+#define ORANGE_RED 140
+//was 658
 
 //movement config
 #define ADJUST 0.2
@@ -47,7 +48,7 @@ MeUltrasonicSensor ultrasonic_3(3);
 MeLineFollower linefollower_2(2);
 MeLightSensor lightsensor_6(6);
 int colourArray[] = {0,0,0};
-int blackArray[] = {392,306,330};
+int blackArray[] = {430,330,374};
 int ambient = 0;
 int colours[3][3] = {
   {255,0,0},
@@ -128,9 +129,6 @@ void turn(int direction) {
     motor_left.run(255);
     motor_right.run(255);
     delay(LEFT_DELAY);
-    motor_left.run(0);
-    motor_right.run(0);
-    delay(600);
     rgbled_7.setColor(0,0,0,0);
     rgbled_7.show(); //off after move straight delay
   }
@@ -138,9 +136,6 @@ void turn(int direction) {
     motor_left.run(-255);
     motor_right.run(-255);
     delay(RIGHT_DELAY);
-    motor_left.run(0);
-    motor_right.run(0);
-    delay(600);
   }
   if (direction == LEFTLEFT) {
     rgbled_7.setColor(0,0,255,0); //shines green when orange
@@ -171,9 +166,6 @@ void turn(int direction) {
     motor_left.run(255);
     motor_right.run(255);
     delay(LEFT_DELAY + 80); //WAS 350
-    motor_left.run(0);
-    motor_right.run(0);
-    delay(600);
     rgbled_7.setColor(0,0,0,0); //off light
     rgbled_7.show();
   }
@@ -204,9 +196,6 @@ void turn(int direction) {
     motor_left.run(-255);
     motor_right.run(-255);
     delay(RIGHT_DELAY + 90); //WAS 350
-    motor_left.run(0);
-    motor_right.run(0);
-    delay(600);
   }
   if (direction == U_TURN) {
     rgbled_7.setColor(0,0,0,0);
@@ -214,11 +203,12 @@ void turn(int direction) {
 
     motor_left.run(-180);
     motor_right.run(-225);
-    delay(560);
+    delay(580);
     motor_left.run(0);
     motor_right.run(0);
     delay(600);
-    accelerate();   //added 
+    accelerate(); 
+
     
     //motor_left.run(0);
     //motor_right.run(0);
@@ -239,26 +229,58 @@ int sound_avg(int sound){
 }
 
 void check_challenge() {
+  /*
+  rgbled_7.setColor(0,0,0,0);
+  rgbled_7.show();
+  delay(RGBWait);
+  int total = 0;
+  for(int i = 0; i < 3; i++){
+    rgbled_7.setColor(0,colours[i][0],colours[i][1],colours[i][2]);
+    rgbled_7.show();
+    delay(RGBWait);
+    colourArray[i] = getAvgReading(5);
+    colourArray[i] = colourArray[i] - blackArray[i];
+    total += colourArray[i];
+  }
+  //Serial.println(total);
+  delay(500);
   a = sound_avg(300);
   b = sound_avg(3000);
-  if(!(a < 190 && b < 20)){  
-    sound();
+  if(total < 500){
+    if(!(a < 190 && b < 20)){  
+      sound();
+    }
   } else {
-    colour();
-  }
+      colour();
+  }*/
+  colour();
 }
 
 void sound(){
+
   ratio = b/a;
+  Serial.print(" ");
+  Serial.println(a);
+  Serial.println(b);
+  Serial.println(ratio);
   if (ratio < 0.5){
     turn(LEFT);
   } else {
-    a -= 180; b -= 15;
-    ratio = b/a;
-    if (ratio < 30){
+    int right = 0;
+    for(int j = 0; j < 5; ++j){
+      a = sound_avg(300);
+      b = sound_avg(3000);
+      int new_ratio = (b-15)/abs(a-180);
+      if(new_ratio >= 15){
+        right = 1;
+        break;
+      }
+    }
+    int new_ratio = (b-15)/abs(a-180);
+    if (right == 0){
       turn(U_TURN);
     } else {
-      turn(RIGHT); 
+      turn(RIGHT);
     }
   }
 }
@@ -288,7 +310,7 @@ void colour(){
     turn(RIGHT);
   } else if (colourArray[0] > colourArray[1] && colourArray[0] > colourArray[2]){
     total = colourArray[1] + colourArray[2] - ambient;
-    if (cheatswitch == 1) {
+    Serial.println(total);
       if(total < ORANGE_RED){//was 280
         turn(LEFT);
       } else if (total >= ORANGE_RED){ //was 280
@@ -296,8 +318,7 @@ void colour(){
       }
     } else {
       turn(LEFT);
-    }
-  }
+    } 
 }
 
 int getAvgReading(int times){      
@@ -333,7 +354,7 @@ void move_straight() {
     motor_right.run(245);
   } else if (ir_left - ir_right < ADJUST && ir_left - ir_right > -ADJUST - 0.05) {
     //rgbled_7.setColor(0,0,0,0);
-    rgbled_7.show();
+    //rgbled_7.show();
     motor_left.run(-255);
     motor_right.run(245);
   } else if (ir_left - ir_right >= ADJUST) { //adjust left
