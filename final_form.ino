@@ -1,3 +1,4 @@
+//libraries required
 #include <Arduino.h>
 #include <Wire.h>
 #include <SoftwareSerial.h>
@@ -78,11 +79,9 @@ int noteDurations[] = {
 8, 8, 4, 4, 4, 4, 2
 };
 
-int cheatswitch = 0;
-
+//function prototype
 void colour();
 void sound();
-void cheat();
 int getAvgReading(int);
 void accelerate();
 void turn(int);
@@ -91,13 +90,21 @@ void move_straight();
 void check_challenge();
 int sound_avg(int);
 
+/*setup: the first thing arduino runs.
+ * Starts serial begin for debugging start digital output for ultrasonic
+ * accelerates mbot to prevent wheelie
+ */
 void setup() {
-  accelerate();
   Serial.begin(9600);
-  pinMode(A7, INPUT); //TO BE REMOVED ON SUBMISSION
-  pinMode(ULTRASONIC, OUTPUT);  
+  pinMode(ULTRASONIC, OUTPUT);
+  accelerate(); 
 }
 
+/*Accelrates mbot to prevent the mbot from going into wheelie
+ * so that the line detector can continue to detect the ground and not
+ * a black line
+ * function basically slowly accelerate the mbot with a for loop.
+*/
 void accelerate() {
   for (int i = 100; i < 256; i += 10) {
     rgbled_7.setColor(0,i,i,i);
@@ -110,6 +117,10 @@ void accelerate() {
   rgbled_7.show();
 }
 
+/*
+ * end of maze functions
+ * plays the melody: its a small world after all.
+*/
 void end(){
   while(1){
     for (int thisNote = 0; thisNote < 39; thisNote++) {
@@ -122,6 +133,13 @@ void end(){
   }
 }
 
+/*function for turning
+ * includes: left, right, 
+ * left and left again on two grids,
+ * right and right again on two grids,
+ *  and uturn
+ * added colour to see which way mbot intend to turn.
+*/
 void turn(int direction) {
   if (direction == LEFT) {
     rgbled_7.setColor(0,255,0,0); //shine red on left
@@ -216,6 +234,10 @@ void turn(int direction) {
   accelerate();
 }
 
+/*
+ * calculates the sound average for the sound function to process
+ * average out of 50 readings.
+*/
 int sound_avg(int sound){
   int total = 0;
   for(int i = 0; i < 50; i++){
@@ -228,8 +250,15 @@ int sound_avg(int sound){
   return total /50;
 }
 
+/*
+ * checks the challenge.
+ * start by checking if the colour is black.
+ * if the colour is black,
+ * continue by checking if there is sound.
+ * if there is sound, continue with sound challenge.
+ * otherwise, continue with colour challgenge.
+*/
 void check_challenge() {
-  /*
   rgbled_7.setColor(0,0,0,0);
   rgbled_7.show();
   delay(RGBWait);
@@ -252,10 +281,17 @@ void check_challenge() {
     }
   } else {
       colour();
-  }*/
-  colour();
+  }
 }
 
+/*
+ * sound function to recognise the difference between
+ * 300hz, 3000hz and the both combine. 
+ * starts by checking 300hz, before moving on to the  
+ * 3000hz and the combination. 300hz is checked first with ratio
+ * before moving on to the new ratio where the difference between the
+ * 3000hz and both waves combine can be more easily differentiated.
+*/
 void sound(){
 
   ratio = b/a;
@@ -285,7 +321,12 @@ void sound(){
   }
 }
 
-
+/*
+ * check the colour of the paper above.
+ * almost same code as during studio.
+ * added ambience light to further differentiate
+ * the colour orange and red.
+*/
 void colour(){
   rgbled_7.setColor(0,0,0,0);
   rgbled_7.show();
@@ -321,6 +362,12 @@ void colour(){
     } 
 }
 
+/*
+ * get average reading is to calculate the
+ * average reading of light before handing it off
+ * to the colour function.
+ * code extracted from studio.
+*/
 int getAvgReading(int times){      
   int reading;
   int total = 0;
@@ -332,6 +379,11 @@ int getAvgReading(int times){
   return total/times;
 }
 
+/*
+ * simple line detection
+ * basically says, if there is line, stop car
+ * and check challenge
+*/
 void detect_line() {
   if (linefollower_2.readSensors() != 3) {
     motor_left.run(0);
@@ -341,6 +393,11 @@ void detect_line() {
   }
 }
 
+/*
+ * move_straight function is used to detect the side of the walls, 
+ * and to adjust accordingly based on how far it is to the walls.
+ * calls the function detect line at the start to check if there is line.
+*/
 void move_straight() {
   detect_line(); 
   rgbled_7.setColor(0,0,0,0);
@@ -371,27 +428,10 @@ void move_straight() {
  delay(20);
 }
 
+/*
+ * loop function of the arduino.
+ * just loops the function move straight.
+*/
 void loop() {
-  cheat();
   move_straight();
-}
-
-void cheat() {
-  if (analogRead(A7) <= 10) {
-    if (cheatswitch == 0) {
-      cheatswitch = 1;
-      rgbled_7.setColor(0,255,165,0);
-      rgbled_7.show();
-    }
-    else { 
-      cheatswitch = 0;
-      rgbled_7.setColor(0,255,20,147);
-      rgbled_7.show();
-    }
-    delay(500);
-    motor_left.run(0);
-    motor_right.run(0);
-    delay(3000);
-    accelerate();
-  }
 }
